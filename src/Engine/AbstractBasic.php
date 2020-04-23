@@ -4,7 +4,7 @@ namespace Bitrix24ApiWrapper\Engine;
 
 use GuzzleHttp;
 
-abstract class AbstractBasic {
+abstract class AbstractBasic implements BasicInterface {
 
     private const METHOD_GET  = 'GET';
     private const METHOD_POST = 'POST';
@@ -45,7 +45,7 @@ abstract class AbstractBasic {
     private function _request(string $httpMethod, string $apiMethod, array $parameters = []) {
         try {
             $res = $this->_httpClient()->request($httpMethod, $this->_prepareUrl($apiMethod), $parameters);
-            return $res->getBody();
+            return $res->getBody()->getContents();
         } catch (GuzzleHttp\Exception\RequestException $exception) {
             throw $this->_replaceRequestException($exception);
         }
