@@ -13,6 +13,8 @@ abstract class AbstractBasic implements BasicInterface {
     private const ERROR_METHOD_NOT_FOUND    = 'ERROR_METHOD_NOT_FOUND';
     private const ERROR_INVALID_CREDENTIALS = 'INVALID_CREDENTIALS';
 
+    private const RESPONSE_RESULT = 'result';
+
     abstract protected function _prepareUrl(string $apiMethod): string;
 
     /**
@@ -21,7 +23,7 @@ abstract class AbstractBasic implements BasicInterface {
      * @return mixed
      */
     public function get(string $apiMethod, array $parameters = []) {
-        return $this->_request(self::METHOD_GET, $apiMethod, $parameters);
+        return $this->_request(self::METHOD_GET, $apiMethod, $parameters)[self::RESPONSE_RESULT];
     }
 
     /**
@@ -30,7 +32,7 @@ abstract class AbstractBasic implements BasicInterface {
      * @return mixed
      */
     public function post(string $apiMethod, array $parameters = []) {
-        return $this->_request(self::METHOD_POST, $apiMethod, $parameters);
+        return $this->_request(self::METHOD_POST, $apiMethod, $parameters)[self::RESPONSE_RESULT];
     }
 
     protected function _httpClient(): GuzzleHttp\ClientInterface {
