@@ -27,5 +27,8 @@
             "Bitrix24ApiWrapper\\Test\\": "test/"
         }
     },
-    "repositories": []
+    "repositories": [],
+    "require-dev": {
+        "phpunit/phpunit": "7"
+    }
 }
