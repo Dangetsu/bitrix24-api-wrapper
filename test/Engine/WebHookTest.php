@@ -25,9 +25,10 @@ class WebHookTest extends AbstractTest {
 
     public function errorsDataProvider(): array {
         return [
-            // response file                                    response code                  expected exception class
-            [__DIR__ . '/Response/error_not_found_method.json', self::HTTP_CODE_NOT_FOUND,     Exception\MethodNotFound::class],
-            [__DIR__ . '/Response/error_deleted_portal.json',   self::HTTP_CODE_ACCESS_DENIED, Exception\PortalDeleted::class],
+            // response file                                         response code                  expected exception class
+            [__DIR__ . '/Response/error_not_found_method.json',      self::HTTP_CODE_NOT_FOUND,     Exception\MethodNotFound::class],
+            [__DIR__ . '/Response/error_deleted_portal.json',        self::HTTP_CODE_ACCESS_DENIED, Exception\PortalDeleted::class],
+            [__DIR__ . '/Response/error_invalid_credentials.json',   self::HTTP_CODE_UNAUTHORIZED,  Exception\InvalidCredentials::class],
         ];
     }
 

@@ -8,6 +8,7 @@ use Psr;
 
 abstract class AbstractTest extends \PHPUnit\Framework\TestCase {
 
+    protected const HTTP_CODE_UNAUTHORIZED  = 401;
     protected const HTTP_CODE_ACCESS_DENIED = 403;
     protected const HTTP_CODE_NOT_FOUND     = 404;
 

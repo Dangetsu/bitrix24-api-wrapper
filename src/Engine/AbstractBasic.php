@@ -9,8 +9,9 @@ abstract class AbstractBasic implements BasicInterface {
     private const METHOD_GET  = 'GET';
     private const METHOD_POST = 'POST';
 
-    private const ERROR_PORTAL_DELETED   = 'PORTAL_DELETED';
-    private const ERROR_METHOD_NOT_FOUND = 'ERROR_METHOD_NOT_FOUND';
+    private const ERROR_PORTAL_DELETED      = 'PORTAL_DELETED';
+    private const ERROR_METHOD_NOT_FOUND    = 'ERROR_METHOD_NOT_FOUND';
+    private const ERROR_INVALID_CREDENTIALS = 'INVALID_CREDENTIALS';
 
     abstract protected function _prepareUrl(string $apiMethod): string;
 
@@ -61,6 +62,8 @@ abstract class AbstractBasic implements BasicInterface {
                 return new Exception\PortalDeleted($exception->getMessage());
             case self::ERROR_METHOD_NOT_FOUND:
                 return new Exception\MethodNotFound($exception->getMessage());
+            case self::ERROR_INVALID_CREDENTIALS:
+                return new Exception\InvalidCredentials($exception->getMessage());
             default:
                 return new Exception\Basic($exception->getMessage());
         }
