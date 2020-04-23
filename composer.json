@@ -1,0 +1,27 @@
+{
+    "name": "dangetsu/bitrix24-api-wrapper",
+    "description": "Wrapper for API Bitrix24",
+    "keywords": ["bitrix24","api","wrapper","sdk"],
+    "homepage": "https://github.com/Dangetsu/bitrix24-api-wrapper",
+    "type": "library",
+    "license": "MIT",
+    "require": {
+        "php": ">=5.5.0",
+        "guzzlehttp/guzzle": ">=5.5.0"
+    },
+    "authors": [
+        {
+            "name": "Vladislav Alatorcev",
+            "email": "clannad_forever@mail.ru",
+            "role": "Developer"
+        }
+    ],
+    "minimum-stability": "stable",
+    "autoload": {
+        "psr-4": {
+            "Bitrix24ApiWrapper\\": "src/",
+            "Bitrix24ApiWrapper\\Test\\": "test/"
+        }
+    },
+    "repositories": []
+}
