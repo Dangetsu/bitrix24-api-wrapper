@@ -6,8 +6,8 @@
     "type": "library",
     "license": "MIT",
     "require": {
-        "php": ">=5.5.0",
-        "guzzlehttp/guzzle": ">=5.5.0"
+        "php": ">=7.1.0",
+        "guzzlehttp/guzzle": ">=6.0"
     },
     "authors": [
         {
@@ -19,7 +19,11 @@
     "minimum-stability": "stable",
     "autoload": {
         "psr-4": {
-            "Bitrix24ApiWrapper\\": "src/",
+            "Bitrix24ApiWrapper\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
             "Bitrix24ApiWrapper\\Test\\": "test/"
         }
     },
