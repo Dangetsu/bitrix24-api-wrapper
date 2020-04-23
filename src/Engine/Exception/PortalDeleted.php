@@ -2,6 +2,6 @@
 
 namespace Bitrix24ApiWrapper\Engine\Exception;
 
-class NotFound extends Basic {
+class PortalDeleted extends Basic {
 
 }

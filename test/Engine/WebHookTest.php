@@ -13,15 +13,15 @@ class WebHookTest extends AbstractTest {
             $this->_prepareMockGetRequest('test'),
             $this->_prepareMockResponse(__DIR__ . '/Response/error_deleted_portal.json', self::HTTP_CODE_ACCESS_DENIED)
         );
-        $this->expectException(Exception\AccessDenied::class);
+        $this->expectException(Exception\PortalDeleted::class);
         $this->_engine()->get('test');
     }
 
     public function testNotFound(): void {
         $this->_engine()->setMockResponse(
             $this->_prepareMockGetRequest('test'),
-            $this->_prepareMockResponse(__DIR__ . '/Response/error_deleted_portal.json', self::HTTP_CODE_NOT_FOUND));
-        $this->expectException(Exception\NotFound::class);
+            $this->_prepareMockResponse(__DIR__ . '/Response/error_not_found_method.json', self::HTTP_CODE_NOT_FOUND));
+        $this->expectException(Exception\MethodNotFound::class);
         $this->_engine()->get('test');
     }
 

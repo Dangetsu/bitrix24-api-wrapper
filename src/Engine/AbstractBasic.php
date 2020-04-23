@@ -9,8 +9,8 @@ abstract class AbstractBasic implements BasicInterface {
     private const METHOD_GET  = 'GET';
     private const METHOD_POST = 'POST';
 
-    private const HTTP_CODE_ACCESS_DENIED = 403;
-    private const HTTP_CODE_NOT_FOUND     = 404;
+    private const ERROR_PORTAL_DELETED   = 'PORTAL_DELETED';
+    private const ERROR_METHOD_NOT_FOUND = 'ERROR_METHOD_NOT_FOUND';
 
     abstract protected function _prepareUrl(string $apiMethod): string;
 
@@ -45,18 +45,22 @@ abstract class AbstractBasic implements BasicInterface {
     private function _request(string $httpMethod, string $apiMethod, array $parameters = []) {
         try {
             $res = $this->_httpClient()->request($httpMethod, $this->_prepareUrl($apiMethod), $parameters);
-            return $res->getBody()->getContents();
+            $data = $res->getBody()->getContents();
+            return json_decode($data, true);
         } catch (GuzzleHttp\Exception\RequestException $exception) {
             throw $this->_replaceRequestException($exception);
         }
     }
 
     private function _replaceRequestException(GuzzleHttp\Exception\RequestException $exception): Exception\Basic {
-        switch ($exception->getCode()) {
-            case self::HTTP_CODE_ACCESS_DENIED:
-                return new Exception\AccessDenied($exception->getMessage());
-            case self::HTTP_CODE_NOT_FOUND:
-                return new Exception\NotFound($exception->getMessage());
+        $body = $exception->getResponse()->getBody()->getContents();
+        $decodedBody = json_decode($body, true);
+        $error = $decodedBody['error'] ?? null;
+        switch ($error) {
+            case self::ERROR_PORTAL_DELETED:
+                return new Exception\PortalDeleted($exception->getMessage());
+            case self::ERROR_METHOD_NOT_FOUND:
+                return new Exception\MethodNotFound($exception->getMessage());
             default:
                 return new Exception\Basic($exception->getMessage());
         }
