@@ -2,11 +2,11 @@
   "result": [
     {
       "ID": "4",
-      "TITLE": "Новый лид от Tilda",
+      "TITLE": "Новый лид от DIO",
       "HONORIFIC": null,
-      "NAME": "Ирина",
+      "NAME": "DIO",
       "SECOND_NAME": null,
-      "LAST_NAME": null,
+      "LAST_NAME": "BRANDO",
       "COMPANY_TITLE": null,
       "COMPANY_ID": null,
       "CONTACT_ID": null,
@@ -17,7 +17,7 @@
       "STATUS_ID": "NEW",
       "STATUS_DESCRIPTION": null,
       "POST": null,
-      "COMMENTS": "email: test@gmail.xcom<br>\nname: Ирина<br>\nphone: 81111111111<br>\nTextarea: Запись на 10или 21января на тридинг<br>\nformname: Записаться на обучение",
+      "COMMENTS": "email: test@gmail.xcom<br>\nname: DIO<br>\nphone: 81111111111<br>\nTextarea: Запись на 10или 21января на тридинг<br>\nformname: Записаться на обучение",
       "CURRENCY_ID": "RUB",
       "OPPORTUNITY": "0.00",
       "HAS_PHONE": "Y",
@@ -80,7 +80,7 @@
         {
           "ID": "2",
           "VALUE_TYPE": "WORK",
-          "VALUE": "xana4500@mail.ru",
+          "VALUE": "test@gmail.xcom",
           "TYPE_ID": "EMAIL"
         }
       ],
@@ -88,7 +88,7 @@
         {
           "ID": "4",
           "VALUE_TYPE": "WORK",
-          "VALUE": "89265374378",
+          "VALUE": "81111111111",
           "TYPE_ID": "PHONE"
         }
       ]

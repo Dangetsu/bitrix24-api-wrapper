@@ -5,6 +5,7 @@ namespace Bitrix24ApiWrapper\Test\Engine;
 use Bitrix24ApiWrapper\Engine;
 use Bitrix24ApiWrapper\Request;
 use Bitrix24ApiWrapper\Library;
+use Bitrix24ApiWrapper\Entity;
 
 class EngineTest extends AbstractTest {
 
@@ -38,17 +39,17 @@ class EngineTest extends AbstractTest {
     public function testSendGetRequest(): void {
         $this->_engine()->setMockResponse(
             $this->_prepareMockGetRequest('crm.lead.list'),
-            $this->_prepareMockResponse(__DIR__ . '/Response/crm_lead_list.json', self::HTTP_CODE_SUCCESS)
+            $this->_prepareMockResponse(__DIR__ . '/Response/crm_lead_list.json')
         );
         $actualResponse = $this->_engine()->execute(Request\Custom::get('crm.lead.list'));
         $this->assertEquals([
             [
                 'ID' => '4',
-                'TITLE' => 'Новый лид от Tilda',
+                'TITLE' => 'Новый лид от DIO',
                 'HONORIFIC' => null,
-                'NAME' => 'Ирина',
+                'NAME' => 'DIO',
                 'SECOND_NAME' => null,
-                'LAST_NAME' => null,
+                'LAST_NAME' => 'BRANDO',
                 'COMPANY_TITLE' => null,
                 'COMPANY_ID' => null,
                 'CONTACT_ID' => null,
@@ -59,7 +60,7 @@ class EngineTest extends AbstractTest {
                 'STATUS_ID' => 'NEW',
                 'STATUS_DESCRIPTION' => null,
                 'POST' => null,
-                'COMMENTS' => "email: test@gmail.xcom<br>\nname: Ирина<br>\nphone: 81111111111<br>\nTextarea: Запись на 10или 21января на тридинг<br>\nformname: Записаться на обучение",
+                'COMMENTS' => "email: test@gmail.xcom<br>\nname: DIO<br>\nphone: 81111111111<br>\nTextarea: Запись на 10или 21января на тридинг<br>\nformname: Записаться на обучение",
                 'CURRENCY_ID' => 'RUB',
                 'OPPORTUNITY' => '0.00',
                 'HAS_PHONE' => 'Y',
@@ -124,7 +125,7 @@ class EngineTest extends AbstractTest {
                     [
                         'ID' => '2',
                         'VALUE_TYPE' => 'WORK',
-                        'VALUE' => 'xana4500@mail.ru',
+                        'VALUE' => 'test@gmail.xcom',
                         'TYPE_ID' => 'EMAIL',
                     ],
                 ],
@@ -132,12 +133,77 @@ class EngineTest extends AbstractTest {
                     [
                         'ID' => '4',
                         'VALUE_TYPE' => 'WORK',
-                        'VALUE' => '89265374378',
+                        'VALUE' => '81111111111',
                         'TYPE_ID' => 'PHONE',
                     ],
                 ],
             ],
         ], $actualResponse);
+    }
+
+    public function testSendItemsRequest(): void {
+        $this->_engine()->setMockResponse(
+            $this->_prepareMockGetRequest('crm.lead.list'),
+            $this->_prepareMockResponse(__DIR__ . '/Response/crm_lead_list.json')
+        );
+        /** @var Entity\CRM\Lead[] $actualResponse */
+        $actualResponse = $this->_engine()->execute(new Request\CRM\Lead\Items());
+        $this->assertFalse($actualResponse[0]->unfamiliarParameter('UF_CRM_1572598226'));
+        $this->assertEquals([$this->_expectedLead()], $actualResponse);
+    }
+
+    private function _expectedLead(): Entity\CRM\Lead {
+        $phone = new Entity\CRM\ContactData();
+        $phone->ID = '4';
+        $phone->VALUE_TYPE = 'WORK';
+        $phone->VALUE = '81111111111';
+        $phone->TYPE_ID = 'PHONE';
+
+        $email = new Entity\CRM\ContactData();
+        $email->ID = '2';
+        $email->VALUE_TYPE = 'WORK';
+        $email->VALUE = 'test@gmail.xcom';
+        $email->TYPE_ID = 'EMAIL';
+
+        $lead = new Entity\CRM\Lead();
+        $lead->ID = '4';
+        $lead->TITLE = 'Новый лид от DIO';
+        $lead->NAME = 'DIO';
+        $lead->LAST_NAME = 'BRANDO';
+        $lead->IS_RETURN_CUSTOMER = 'N';
+        $lead->BIRTHDATE = '';
+        $lead->STATUS_ID = 'NEW';
+        $lead->COMMENTS = "email: test@gmail.xcom<br>\nname: DIO<br>\nphone: 81111111111<br>\nTextarea: Запись на 10или 21января на тридинг<br>\nformname: Записаться на обучение";
+        $lead->CURRENCY_ID = 'RUB';
+        $lead->OPPORTUNITY = '0.00';
+        $lead->HAS_PHONE = 'Y';
+        $lead->HAS_EMAIL = 'Y';
+        $lead->HAS_IMOL = 'N';
+        $lead->ASSIGNED_BY_ID = '1';
+        $lead->CREATED_BY_ID = '1';
+        $lead->MODIFY_BY_ID = '1';
+        $lead->DATE_CREATE = '2018-12-29T22:00:41+03:00';
+        $lead->DATE_MODIFY = '2018-12-29T22:00:41+03:00';
+        $lead->DATE_CLOSED = '';
+        $lead->STATUS_SEMANTIC_ID = 'P';
+        $lead->OPENED = 'N';
+        $lead->EMAIL = [$email];
+        $lead->PHONE = [$phone];
+        $lead->UF_CRM_1572597853 = false;
+        $lead->UF_CRM_1572597891 = false;
+        $lead->UF_CRM_1572597944 = false;
+        $lead->UF_CRM_1572598005 = '';
+        $lead->UF_CRM_1572598029 = '';
+        $lead->UF_CRM_1572598048 = '';
+        $lead->UF_CRM_1572598083 = '';
+        $lead->UF_CRM_1572598126 = false;
+        $lead->UF_CRM_1572598145 = false;
+        $lead->UF_CRM_1572598226 = false;
+        $lead->UF_CRM_1572598270 = false;
+        $lead->UF_CRM_1572598420 = false;
+        $lead->UF_CRM_1572598454 = [];
+        $lead->UF_CRM_1572598529 = false;
+        return $lead;
     }
 
     protected function _prepareUrl(string $apiMethod): string {

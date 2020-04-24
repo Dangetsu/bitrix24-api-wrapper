@@ -65,12 +65,9 @@ abstract class AbstractBasic implements BasicInterface {
         if ($responseEntity === null || !is_array($data)) {
             return $data;
         }
-        if ($this->_utils()->isAssocArray($data)) {
-            return $this->_builder()->buildEntity($responseEntity, $data);
-        }
-        return array_map(function (array $entityData) use($responseEntity) {
-            return $this->_builder()->buildEntity($responseEntity, $entityData);
-        }, $data);
+        return $this->_utils()->isAssocArray($data)
+            ? $this->_builder()->buildEntity($responseEntity, $data)
+            : $this->_builder()->buildEntities($responseEntity, $data);
     }
 
     /**

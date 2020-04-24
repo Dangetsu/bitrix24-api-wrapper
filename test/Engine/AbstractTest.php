@@ -36,4 +36,44 @@ abstract class AbstractTest extends \PHPUnit\Framework\TestCase {
     protected function _prepareMockResponse(string $responseFile, int $statusCode = 200): Psr\Http\Message\ResponseInterface {
         return new GuzzleHttp\Psr7\Response($statusCode, ['Content-Type' => 'application/json'], file_get_contents($responseFile));
     }
+
+    // Just utils for generate code Entity initialization :)
+    // Return:
+    // $lead = new Entity\CRM\Lead();
+    // $lead->ID = '4';
+    // ...
+    protected function _prepareEntityForUnitTest(string $variableName, string $entityClass, array $entityData): void {
+        $preparedEntityClass = str_replace('Bitrix24ApiWrapper\\', '', $entityClass);
+        $text = "\${$variableName} = new {$preparedEntityClass}();\n";
+        foreach ($entityData as $key => $value) {
+            if ($value === null) {
+                continue;
+            }
+            $preparedValue = $this->_var_export54($value);
+            $text .= "\${$variableName}->{$key} = {$preparedValue};\n";
+        }
+        die($text);
+    }
+
+    private function _var_export54($var, $indent="") {
+        switch (gettype($var)) {
+            case "string":
+                return "'" . addcslashes($var, "\\\$\"\r\n\t\v\f") . "'";
+            case "array":
+                $indexed = array_keys($var) === range(0, count($var) - 1);
+                $r = [];
+                foreach ($var as $key => $value) {
+                    $r[] = "$indent    "
+                        . ($indexed ? "" : $this->_var_export54($key) . " => ")
+                        . $this->_var_export54($value, "$indent    ");
+                }
+
+                $isNeedComma = count($r) > 0;
+                return "[\n" . implode(",\n", $r) . ($isNeedComma ? ',' : '') . "\n" . $indent . "]";
+            case "boolean":
+                return $var ? "true" : "false";
+            default:
+                return $var === null ? 'null' : var_export($var, TRUE);
+        }
+    }
 }
