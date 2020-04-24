@@ -2,7 +2,8 @@
 
 namespace Bitrix24ApiWrapper\Test\Engine;
 
-use Bitrix24ApiWrapper\Engine\Exception;
+use Bitrix24ApiWrapper\Engine;
+use Bitrix24ApiWrapper\Request;
 
 class WebHookTest extends AbstractTest {
 
@@ -20,15 +21,15 @@ class WebHookTest extends AbstractTest {
             $this->_prepareMockResponse($responseFile, $responseCode)
         );
         $this->expectException($exceptionClass);
-        $this->_engine()->get('test');
+        $this->_engine()->execute(Request\Custom::get('test'));
     }
 
     public function errorsDataProvider(): array {
         return [
             // response file                                         response code                  expected exception class
-            [__DIR__ . '/Response/error_not_found_method.json',      self::HTTP_CODE_NOT_FOUND,     Exception\MethodNotFound::class],
-            [__DIR__ . '/Response/error_deleted_portal.json',        self::HTTP_CODE_ACCESS_DENIED, Exception\PortalDeleted::class],
-            [__DIR__ . '/Response/error_invalid_credentials.json',   self::HTTP_CODE_UNAUTHORIZED,  Exception\InvalidCredentials::class],
+            [__DIR__ . '/Response/error_not_found_method.json',      self::HTTP_CODE_NOT_FOUND,     Engine\Exception\MethodNotFound::class],
+            [__DIR__ . '/Response/error_deleted_portal.json',        self::HTTP_CODE_ACCESS_DENIED, Engine\Exception\PortalDeleted::class],
+            [__DIR__ . '/Response/error_invalid_credentials.json',   self::HTTP_CODE_UNAUTHORIZED,  Engine\Exception\InvalidCredentials::class],
         ];
     }
 
@@ -37,7 +38,7 @@ class WebHookTest extends AbstractTest {
             $this->_prepareMockGetRequest('crm.lead.list'),
             $this->_prepareMockResponse(__DIR__ . '/Response/crm_lead_list.json', self::HTTP_CODE_SUCCESS)
         );
-        $actualResponse = $this->_engine()->get('crm.lead.list');
+        $actualResponse = $this->_engine()->execute(Request\Custom::get('crm.lead.list'));
         $this->assertEquals([
             [
                 'ID' => '2',

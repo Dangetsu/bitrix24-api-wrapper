@@ -2,12 +2,11 @@
 
 namespace Bitrix24ApiWrapper\Engine;
 
+use Bitrix24ApiWrapper\Request;
+use Bitrix24ApiWrapper\Library;
 use GuzzleHttp;
 
 abstract class AbstractBasic implements BasicInterface {
-
-    private const METHOD_GET  = 'GET';
-    private const METHOD_POST = 'POST';
 
     private const ERROR_PORTAL_DELETED      = 'PORTAL_DELETED';
     private const ERROR_METHOD_NOT_FOUND    = 'ERROR_METHOD_NOT_FOUND';
@@ -15,28 +14,63 @@ abstract class AbstractBasic implements BasicInterface {
 
     private const RESPONSE_RESULT = 'result';
 
+    /** @var Builder\BasicInterface */
+    private $_builder;
+
+    /** @var GuzzleHttp\ClientInterface */
+    private $_httpClient;
+
+    /** @var Library\Utils */
+    private $_utils;
+
     abstract protected function _prepareUrl(string $apiMethod): string;
 
     /**
-     * @param string $apiMethod
-     * @param array $parameters
+     * @param Request\BasicInterface $request
      * @return mixed
      */
-    public function get(string $apiMethod, array $parameters = []) {
-        return $this->_request(self::METHOD_GET, $apiMethod, $parameters)[self::RESPONSE_RESULT];
+    public function execute(Request\BasicInterface $request) {
+        $response = $this->_request($request->httpMethod(), $request->apiMethod(), $request->parameters());
+        $result = $response[self::RESPONSE_RESULT] ?? null;
+        return $this->_prepareResponse($request->responseEntity(), $result);
     }
 
-    /**
-     * @param string $apiMethod
-     * @param array $parameters
-     * @return mixed
-     */
-    public function post(string $apiMethod, array $parameters = []) {
-        return $this->_request(self::METHOD_POST, $apiMethod, $parameters)[self::RESPONSE_RESULT];
+    protected function _builder(): Builder\BasicInterface {
+        if ($this->_builder === null) {
+            $this->_builder = new Builder\Basic();
+        }
+        return $this->_builder;
     }
 
     protected function _httpClient(): GuzzleHttp\ClientInterface {
-        return new GuzzleHttp\Client();
+        if ($this->_httpClient === null) {
+            $this->_httpClient = new GuzzleHttp\Client();
+        }
+        return $this->_httpClient;
+    }
+
+    protected function _utils(): Library\Utils {
+        if ($this->_utils === null) {
+            $this->_utils = new Library\Utils();
+        }
+        return $this->_utils;
+    }
+
+    /**
+     * @param string|null $responseEntity
+     * @param mixed $data
+     * @return mixed
+     */
+    private function _prepareResponse(?string $responseEntity, $data) {
+        if ($responseEntity === null || !is_array($data)) {
+            return $data;
+        }
+        if ($this->_utils()->isAssocArray($data)) {
+            return $this->_builder()->buildEntity($responseEntity, $data);
+        }
+        return array_map(function (array $entityData) use($responseEntity) {
+            return $this->_builder()->buildEntity($responseEntity, $entityData);
+        }, $data);
     }
 
     /**
@@ -49,15 +83,15 @@ abstract class AbstractBasic implements BasicInterface {
         try {
             $res = $this->_httpClient()->request($httpMethod, $this->_prepareUrl($apiMethod), $parameters);
             $data = $res->getBody()->getContents();
-            return json_decode($data, true);
+            return $this->_utils()->jsonDecode($data);
         } catch (GuzzleHttp\Exception\RequestException $exception) {
             throw $this->_replaceRequestException($exception);
         }
     }
 
     private function _replaceRequestException(GuzzleHttp\Exception\RequestException $exception): Exception\Basic {
-        $body = $exception->getResponse()->getBody()->getContents();
-        $decodedBody = json_decode($body, true);
+        $body = $exception->getResponse() !== null ? $exception->getResponse()->getBody()->getContents() : null;
+        $decodedBody = $this->_utils()->jsonDecode($body);
         $error = $decodedBody['error'] ?? null;
         switch ($error) {
             case self::ERROR_PORTAL_DELETED:
