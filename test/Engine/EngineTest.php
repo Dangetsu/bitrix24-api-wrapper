@@ -4,8 +4,9 @@ namespace Bitrix24ApiWrapper\Test\Engine;
 
 use Bitrix24ApiWrapper\Engine;
 use Bitrix24ApiWrapper\Request;
+use Bitrix24ApiWrapper\Library;
 
-class WebHookTest extends AbstractTest {
+class EngineTest extends AbstractTest {
 
     private const WEB_HOOK = 'https://b24-xxxxxxx.bitrix24.ru/rest/1/******';
 
@@ -30,6 +31,7 @@ class WebHookTest extends AbstractTest {
             [__DIR__ . '/Response/error_not_found_method.json',      self::HTTP_CODE_NOT_FOUND,     Engine\Exception\MethodNotFound::class],
             [__DIR__ . '/Response/error_deleted_portal.json',        self::HTTP_CODE_ACCESS_DENIED, Engine\Exception\PortalDeleted::class],
             [__DIR__ . '/Response/error_invalid_credentials.json',   self::HTTP_CODE_UNAUTHORIZED,  Engine\Exception\InvalidCredentials::class],
+            [__DIR__ . '/Response/error_invalid_json.json',          self::HTTP_CODE_SUCCESS,       Library\Exception\JSON::class],
         ];
     }
 
