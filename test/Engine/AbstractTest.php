@@ -77,6 +77,11 @@ abstract class AbstractTest extends \PHPUnit\Framework\TestCase {
         ], $actualResponse);
     }
 
+    public function testUnsupportedHttpMethod(): void {
+        $this->expectException(Engine\Exception\UnsupportedHttpMethod::class);
+        $this->_engine()->execute(new Request\Custom('PUT', 'test'));
+    }
+
     public function testItemsRequest(): void {
         $parameters = ['select' => ['*', 'UF_*', 'EMAIL', 'PHONE'], 'filter' => ['NAME' => 'DIO'], 'order' => ['ID' => 'DESC']];
         $this->_engine()->setMockResponse(
