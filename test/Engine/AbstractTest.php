@@ -29,8 +29,11 @@ abstract class AbstractTest extends \PHPUnit\Framework\TestCase {
         return $this->_engine;
     }
 
-    protected function _prepareMockGetRequest(string $apiMethod): Psr\Http\Message\RequestInterface {
-        return new Psr7\Request(self::METHOD_GET, $this->_prepareUrl($apiMethod), [], null);
+    protected function _prepareMockGetRequest(string $apiMethod, array $parameters = []): Psr\Http\Message\RequestInterface {
+        $url = $this->_prepareUrl($apiMethod);
+        $delimiter = mb_strpos($url, '?') !== false ? '&' : '?';
+        $urlWithQuery = "{$url}{$delimiter}" . http_build_query($parameters);
+        return new Psr7\Request(self::METHOD_GET, $urlWithQuery, [], null);
     }
 
     protected function _prepareMockResponse(string $responseFile, int $statusCode = 200): Psr\Http\Message\ResponseInterface {

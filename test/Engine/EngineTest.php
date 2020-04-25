@@ -143,11 +143,11 @@ class EngineTest extends AbstractTest {
 
     public function testSendItemsRequest(): void {
         $this->_engine()->setMockResponse(
-            $this->_prepareMockGetRequest('crm.lead.list'),
+            $this->_prepareMockGetRequest('crm.lead.list', ['select' => ['*', 'UF_*', 'EMAIL', 'PHONE'], 'filter' => ['NAME' => 'DIO'], 'order' => ['ID' => 'DESC']]),
             $this->_prepareMockResponse(__DIR__ . '/Response/crm_lead_list.json')
         );
         /** @var Entity\CRM\Lead[] $actualResponse */
-        $actualResponse = $this->_engine()->execute(new Request\CRM\Lead\Items());
+        $actualResponse = $this->_engine()->execute(new Request\CRM\Lead\Items(['NAME' => 'DIO'], ['ID' => 'DESC']));
         $this->assertFalse($actualResponse[0]->unfamiliarParameter('UF_CRM_1572598226'));
         $this->assertEquals([$this->_expectedLead()], $actualResponse);
     }

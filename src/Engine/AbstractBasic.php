@@ -8,6 +8,9 @@ use GuzzleHttp;
 
 abstract class AbstractBasic implements BasicInterface {
 
+    private const HTTP_METHOD_GET  = 'GET';
+    private const HTTP_METHOD_POST = 'POST';
+
     private const ERROR_PORTAL_DELETED      = 'PORTAL_DELETED';
     private const ERROR_METHOD_NOT_FOUND    = 'ERROR_METHOD_NOT_FOUND';
     private const ERROR_INVALID_CREDENTIALS = 'INVALID_CREDENTIALS';
@@ -77,12 +80,25 @@ abstract class AbstractBasic implements BasicInterface {
      * @return mixed
      */
     private function _request(string $httpMethod, string $apiMethod, array $parameters = []) {
+        $url = $this->_prepareUrl($apiMethod);
+        $options = $this->_prepareOptionsByHttpMethod($httpMethod, $parameters);
         try {
-            $res = $this->_httpClient()->request($httpMethod, $this->_prepareUrl($apiMethod), $parameters);
+            $res = $this->_httpClient()->request($httpMethod, $url, $options);
             $data = $res->getBody()->getContents();
             return $this->_utils()->jsonDecode($data);
         } catch (GuzzleHttp\Exception\RequestException $exception) {
             throw $this->_replaceRequestException($exception);
+        }
+    }
+
+    private function _prepareOptionsByHttpMethod(string $httpMethod, array $parameters = []): array {
+        switch ($httpMethod) {
+            case self::HTTP_METHOD_GET:
+                return [GuzzleHttp\RequestOptions::QUERY => $parameters];
+            case self::HTTP_METHOD_POST:
+                return [GuzzleHttp\RequestOptions::BODY => $parameters];
+            default:
+                throw new Exception\UnsupportedHttpMethod("Method {$httpMethod} isn't supported!");
         }
     }
 

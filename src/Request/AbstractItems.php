@@ -38,7 +38,7 @@ abstract class AbstractItems implements BasicInterface {
             $parameters['filter'] = $this->_filter;
         }
         if (count($this->_order) > 0) {
-            $parameters['order'] = $this->_filter;
+            $parameters['order'] = $this->_order;
         }
         return $parameters;
     }
