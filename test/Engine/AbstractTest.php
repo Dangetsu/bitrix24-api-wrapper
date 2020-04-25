@@ -47,7 +47,6 @@ abstract class AbstractTest extends \PHPUnit\Framework\TestCase {
             [__DIR__ . '/Response/error_not_found_method.json',      self::HTTP_CODE_NOT_FOUND,     Engine\Exception\MethodNotFound::class],
             [__DIR__ . '/Response/error_deleted_portal.json',        self::HTTP_CODE_ACCESS_DENIED, Engine\Exception\PortalDeleted::class],
             [__DIR__ . '/Response/error_invalid_credentials.json',   self::HTTP_CODE_UNAUTHORIZED,  Engine\Exception\InvalidCredentials::class],
-            [__DIR__ . '/Response/error_invalid_json.json',          self::HTTP_CODE_SUCCESS,       Library\Exception\JSON::class],
         ];
     }
 
@@ -135,7 +134,7 @@ abstract class AbstractTest extends \PHPUnit\Framework\TestCase {
         return new Psr7\Request(self::METHOD_GET, $urlWithQuery, [], null);
     }
 
-    protected function _prepareMockResponse(string $responseFile, int $statusCode = 200): Psr\Http\Message\ResponseInterface {
+    protected function _prepareMockResponse(string $responseFile, int $statusCode = self::HTTP_CODE_SUCCESS): Psr\Http\Message\ResponseInterface {
         return new GuzzleHttp\Psr7\Response($statusCode, ['Content-Type' => 'application/json'], file_get_contents($responseFile));
     }
 }
