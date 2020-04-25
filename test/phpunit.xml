@@ -8,6 +8,7 @@
             <directory>../</directory>
             <exclude>
                 <directory>../test</directory>
+                <directory>../vendor</directory>
             </exclude>
         </whitelist>
     </filter>
