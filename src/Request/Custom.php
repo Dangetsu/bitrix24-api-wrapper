@@ -14,11 +14,11 @@ class Custom implements BasicInterface {
     private $_parameters;
 
     public static function get(string $apiMethod, array $parameters = []): self {
-        return new self(self::METHOD_GET, $apiMethod, $parameters);
+        return new static(self::METHOD_GET, $apiMethod, $parameters);
     }
 
     public static function post(string $apiMethod, array $parameters = []): self {
-        return new self(self::METHOD_POST, $apiMethod, $parameters);
+        return new static(self::METHOD_POST, $apiMethod, $parameters);
     }
 
     public function __construct(string $httpMethod, string $apiMethod, array $parameters = []) {
