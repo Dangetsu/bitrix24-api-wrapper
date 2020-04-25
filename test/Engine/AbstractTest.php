@@ -49,7 +49,7 @@ abstract class AbstractTest extends \PHPUnit\Framework\TestCase {
         ];
     }
 
-    public function testSendGetRequest(): void {
+    public function testGetRequest(): void {
         $this->_engine()->setMockResponse(
             $this->_prepareMockGetRequest('crm.lead.list'),
             $this->_prepareMockResponse(__DIR__ . '/Response/entity_list.json')
@@ -77,7 +77,7 @@ abstract class AbstractTest extends \PHPUnit\Framework\TestCase {
         ], $actualResponse);
     }
 
-    public function testSendItemsRequest(): void {
+    public function testItemsRequest(): void {
         $parameters = ['select' => ['*', 'UF_*', 'EMAIL', 'PHONE'], 'filter' => ['NAME' => 'DIO'], 'order' => ['ID' => 'DESC']];
         $this->_engine()->setMockResponse(
             $this->_prepareMockGetRequest('entity.list', $parameters),
@@ -88,13 +88,27 @@ abstract class AbstractTest extends \PHPUnit\Framework\TestCase {
         $this->assertEquals($this->_expectedSomeEntities(), $actualResponse);
     }
 
+    public function testItemRequest(): void {
+        $parameters = ['ID' => 6];
+        $this->_engine()->setMockResponse(
+            $this->_prepareMockGetRequest('entity.get', $parameters),
+            $this->_prepareMockResponse(__DIR__ . '/Response/entity_get.json')
+        );
+        /** @var Entity\CRM\Lead[] $actualResponse */
+        $actualResponse = $this->_engine()->execute(Mock\Request\Some::get('entity.get', $parameters));
+        $this->assertEquals($this->_expectedSecondSomeEntity(), $actualResponse);
+    }
+
     /**
      * @return Mock\Entity\SomeEntity[]
      */
     private function _expectedSomeEntities(): array {
         $firstEntity = new Mock\Entity\SomeEntity();
         $firstEntity->INT = 8;
+        return [$firstEntity, $this->_expectedSecondSomeEntity()];
+    }
 
+    private function _expectedSecondSomeEntity(): Mock\Entity\SomeEntity {
         $object = new Mock\Entity\SomeObject();
         $object->ID = '4';
         $object->VALUE = 'test@gmail.xcom';
@@ -116,7 +130,7 @@ abstract class AbstractTest extends \PHPUnit\Framework\TestCase {
         $secondEntity->OBJECT = $object;
         $secondEntity->OBJECTS = [$firstObjects, $secondObjects];
         $secondEntity->UNFAMILIAR = '21314';
-        return [$firstEntity, $secondEntity];
+        return $secondEntity;
     }
 
     protected function _engine(): Mock\Extension\MockedEngineInterface {
