@@ -7,6 +7,8 @@ abstract class AbstractItems implements BasicInterface {
     private const SELECT_FIELDS_MASK_ALL    = '*';
     private const SELECT_FIELDS_MASK_CUSTOM = 'UF_*';
 
+    private const PARAM_START_LOAD_ONLY_FIRST_PAGE = '-1';
+
     /** @var array */
     private $_filter;
 
@@ -16,10 +18,22 @@ abstract class AbstractItems implements BasicInterface {
     /** @var array */
     private $_select;
 
-    public function __construct(array $filter = [], array $order = [], array $select = []) {
+    /** @var bool */
+    private $_isLoadOnlyFirstPage;
+
+    public static function all(array $filter = [], array $order = [], array $select = []): self {
+        return new static($filter, $order, $select);
+    }
+
+    public static function firstPage(array $filter = [], array $order = [], array $select = []): self {
+        return new static($filter, $order, $select, true);
+    }
+
+    public function __construct(array $filter = [], array $order = [], array $select = [], bool $isLoadOnlyFirstPage = false) {
         $this->_filter = $filter;
-        $this->_order  = $order;
+        $this->_order = $order;
         $this->_select = $select;
+        $this->_isLoadOnlyFirstPage = $isLoadOnlyFirstPage;
     }
 
     abstract public function responseEntity(): ?string;
@@ -39,6 +53,9 @@ abstract class AbstractItems implements BasicInterface {
         }
         if (count($this->_order) > 0) {
             $parameters['order'] = $this->_order;
+        }
+        if ($this->_isLoadOnlyFirstPage) {
+            $parameters['start'] = self::PARAM_START_LOAD_ONLY_FIRST_PAGE;
         }
         return $parameters;
     }

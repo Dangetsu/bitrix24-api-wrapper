@@ -4,7 +4,6 @@ namespace Bitrix24ApiWrapper\Test\Engine;
 
 use Bitrix24ApiWrapper\Engine;
 use Bitrix24ApiWrapper\Request;
-use Bitrix24ApiWrapper\Library;
 use Bitrix24ApiWrapper\Entity;
 use GuzzleHttp;
 use GuzzleHttp\Psr7;
