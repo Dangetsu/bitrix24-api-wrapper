@@ -7,9 +7,6 @@ use Bitrix24ApiWrapper\Entity;
 class ContactData extends Entity\AbstractBasic {
 
     /** @var string */
-    public $ID;
-
-    /** @var string */
     public $VALUE_TYPE;
 
     /** @var string */

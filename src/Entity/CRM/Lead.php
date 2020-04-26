@@ -10,9 +10,6 @@ class Lead extends Entity\AbstractBasic {
     public const PROPERTY_EMAIL = 'EMAIL';
 
     /** @var string */
-    public $ID;
-
-    /** @var string */
     public $TITLE;
 
     /** @var string */

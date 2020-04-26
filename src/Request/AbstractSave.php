@@ -12,6 +12,15 @@ abstract class AbstractSave implements BasicInterface {
     /** @var array */
     private $_additionalParams;
 
+    /**
+     * @param Entity\BasicInterface $entity
+     * @param array $additionalParams
+     * @return static
+     */
+    public static function instance(Entity\BasicInterface $entity, array $additionalParams = []): self {
+        return new static($entity, $additionalParams);
+    }
+
     public function __construct(Entity\BasicInterface $entity, array $additionalParams = []) {
         $this->_entity = $entity;
         $this->_additionalParams = $additionalParams;
@@ -22,9 +31,14 @@ abstract class AbstractSave implements BasicInterface {
     }
 
     public function parameters(): array {
-        return array_merge([
-            'fields' => $this->_entity->jsonSerialize(),
-        ], $this->_additionalParams);
+        $parameters = ['fields' => $this->_entity->jsonSerialize()];
+        if ($this->_entity->id() !== null) {
+            $parameters['id'] = $this->_entity->id();
+        }
+        if (count($this->_additionalParams) > 0) {
+            $parameters['params'] = $this->_additionalParams;
+        }
+        return $parameters;
     }
 
     public function responseEntity(): ?string {

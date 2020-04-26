@@ -2,10 +2,17 @@
 
 namespace Bitrix24ApiWrapper\Entity;
 
-class AbstractBasic implements BasicInterface {
+abstract class AbstractBasic implements BasicInterface {
+
+    /** @var string */
+    public $ID;
 
     /** @var array */
     private $_unfamiliarParameters = [];
+
+    public function id(): ?string {
+        return $this->ID;
+    }
 
     /**
      * @param string $name
@@ -24,8 +31,11 @@ class AbstractBasic implements BasicInterface {
     }
 
     public function jsonSerialize(): array {
-        // todo: realize for send entities by api
-        return [];
+        $parameters = array_merge(get_object_vars($this), $this->_unfamiliarParameters);
+        unset($parameters['_unfamiliarParameters']);
+        return array_filter($parameters, function($propertyValue): bool {
+            return $propertyValue !== null;
+        });
     }
 
     public function propertyConfiguration(string $propertyName): ?PropertyConfiguration\BasicInterface {

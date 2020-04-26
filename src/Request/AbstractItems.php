@@ -21,10 +21,22 @@ abstract class AbstractItems implements BasicInterface {
     /** @var bool */
     private $_isLoadOnlyFirstPage;
 
+    /**
+     * @param array $filter
+     * @param array $order
+     * @param array $select
+     * @return static
+     */
     public static function all(array $filter = [], array $order = [], array $select = []): self {
         return new static($filter, $order, $select);
     }
 
+    /**
+     * @param array $filter
+     * @param array $order
+     * @param array $select
+     * @return static
+     */
     public static function firstPage(array $filter = [], array $order = [], array $select = []): self {
         return new static($filter, $order, $select, true);
     }

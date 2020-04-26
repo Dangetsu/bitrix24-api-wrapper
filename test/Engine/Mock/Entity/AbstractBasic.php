@@ -6,6 +6,13 @@ use Bitrix24ApiWrapper\Entity;
 
 abstract class AbstractBasic implements Entity\BasicInterface {
 
+    /** @var string */
+    public $ID;
+
+    public function id(): ?string {
+        return $this->ID;
+    }
+
     public function propertyConfiguration(string $propertyName): ?Entity\PropertyConfiguration\BasicInterface {
         return null;
     }
