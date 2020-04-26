@@ -36,10 +36,6 @@ abstract class AbstractItems implements BasicInterface {
         $this->_isLoadOnlyFirstPage = $isLoadOnlyFirstPage;
     }
 
-    abstract public function responseEntity(): ?string;
-
-    abstract public function apiMethod(): string;
-
     public function httpMethod(): string {
         return self::METHOD_GET;
     }

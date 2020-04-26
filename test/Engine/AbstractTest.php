@@ -19,7 +19,7 @@ abstract class AbstractTest extends \PHPUnit\Framework\TestCase {
      * @param string $exceptionClass
      * @dataProvider errorsDataProvider
      */
-    public function testErrors(string $responseFile, int $responseCode, string $exceptionClass): void {
+    public function testApiErrors(string $responseFile, int $responseCode, string $exceptionClass): void {
         $this->_engine()->setMockResponse(Entity\Mock::get('test', $responseFile, [], $responseCode));
         $this->expectException($exceptionClass);
         $this->_engine()->execute(Bitrix24ApiWrapper\Request\Custom::get('test'));
@@ -34,7 +34,7 @@ abstract class AbstractTest extends \PHPUnit\Framework\TestCase {
         ];
     }
 
-    public function testGetRequest(): void {
+    public function testGetClearResponseProcess(): void {
         $this->_engine()->setMockResponse(Entity\Mock::get('entity.list', __DIR__ . '/Response/entity_list.json'));
         $actualResponse = $this->_engine()->execute(Bitrix24ApiWrapper\Request\Custom::get('entity.list'));
         $this->assertEquals([
@@ -64,7 +64,7 @@ abstract class AbstractTest extends \PHPUnit\Framework\TestCase {
         $this->_engine()->execute(new Bitrix24ApiWrapper\Request\Custom('PUT', 'test'));
     }
 
-    public function testItemsRequest(): void {
+    public function testLoadItemsProcess(): void {
         $parameters = ['select' => ['*', 'UF_*', 'EMAIL', 'PHONE'], 'filter' => ['NAME' => 'DIO'], 'order' => ['ID' => 'DESC']];
         $this->_engine()->setMockResponse(Entity\Mock::get('entity.list', __DIR__ . '/Response/entity_list.json', $parameters));
         /** @var Bitrix24ApiWrapper\Entity\CRM\Lead[] $actualResponse */
@@ -72,7 +72,7 @@ abstract class AbstractTest extends \PHPUnit\Framework\TestCase {
         $this->assertEquals($this->_expectedSomeEntities(), $actualResponse);
     }
 
-    public function testItemsMultiPageRequest(): void {
+    public function testLoadItemsMultiPageProcess(): void {
         $this->_engine()->setMockResponse(Entity\Mock::get('entity.list', __DIR__ . '/Response/entity_list_page_1.json'));
         $this->_engine()->setMockResponse(Entity\Mock::get('entity.list', __DIR__ . '/Response/entity_list_page_2.json', ['start' => 1]));
         /** @var Bitrix24ApiWrapper\Entity\CRM\Lead[] $actualResponse */
@@ -88,12 +88,26 @@ abstract class AbstractTest extends \PHPUnit\Framework\TestCase {
         $this->_engine()->execute(Mock\Request\Some::get('entity.list'));
     }
 
-    public function testItemRequest(): void {
+    public function testLoadItemProcess(): void {
         $parameters = ['ID' => 6];
         $this->_engine()->setMockResponse(Entity\Mock::get('entity.get', __DIR__ . '/Response/entity_get.json', $parameters));
         /** @var Bitrix24ApiWrapper\Entity\CRM\Lead[] $actualResponse */
         $actualResponse = $this->_engine()->execute(Mock\Request\Some::get('entity.get', $parameters));
         $this->assertEquals($this->_expectedSecondSomeEntity(), $actualResponse);
+    }
+
+    public function testSaveProcess(): void {
+        $parameters = [
+            'some_parameter' => 'some_value',
+            'fields'         => [
+                'TITLE'     => 'Some title',
+                'NAME'      => 'Vasya',
+                'STATUS_ID' => 'NEW',
+            ],
+        ];
+        $this->_engine()->setMockResponse(Entity\Mock::post('entity.save', __DIR__ . '/Response/entity_save.json', $parameters));
+        $actualResponse = $this->_engine()->execute(Mock\Request\Some::post('entity.save', $parameters));
+        $this->assertSame('2', $actualResponse);
     }
 
     /**

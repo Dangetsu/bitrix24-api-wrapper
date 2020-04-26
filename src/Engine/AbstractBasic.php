@@ -127,7 +127,7 @@ abstract class AbstractBasic implements BasicInterface {
             case self::HTTP_METHOD_GET:
                 return [GuzzleHttp\RequestOptions::QUERY => $parameters];
             case self::HTTP_METHOD_POST:
-                return [GuzzleHttp\RequestOptions::BODY => $parameters];
+                return [GuzzleHttp\RequestOptions::FORM_PARAMS => $parameters];
             default:
                 throw new Exception\UnsupportedHttpMethod("Method {$httpMethod} isn't supported!");
         }
