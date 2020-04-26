@@ -2,7 +2,7 @@
 
 namespace Bitrix24ApiWrapper\Test\Engine\Mock\Extension;
 
-use Bitrix24ApiWrapper\Test\Engine\Exception;
+use Bitrix24ApiWrapper\Test;
 use GuzzleHttp;
 use Psr;
 
@@ -11,7 +11,9 @@ trait MockedEngineTrait {
     /** @var array */
     private $_mockedResponseStack = [];
 
-    public function setMockResponse(Psr\Http\Message\RequestInterface $request, Psr\Http\Message\ResponseInterface $response): void {
+    public function setMockResponse(Test\Engine\Entity\Mock $mock): void {
+        $request = $mock->isGetHttpMethod() ? $this->_prepareMockGetRequest($mock->apiMethod(), $mock->parameters()) : null; // todo: add post
+        $response = $this->_prepareMockResponse($mock->responseFile(), $mock->responseCode());
         $key = $this->_calcMd5ByRequest($request);
         $this->_mockedResponseStack[$key] = $response;
     }
@@ -34,7 +36,7 @@ trait MockedEngineTrait {
             $response = $this->_mockedResponseStack[$requestMd5] ?? null;
             if ($response === null) {
                 $actualRequestData = $this->_serializeRequest($request);
-                throw new Exception\MockedResponseNotFound("Mocked response not found. Request: {$actualRequestData}");
+                throw new Test\Engine\Exception\MockedResponseNotFound("Mocked response not found. Request: {$actualRequestData}");
             }
             $handler->append($response);
             return $handler($request, $options);
@@ -53,5 +55,16 @@ trait MockedEngineTrait {
             'uri'    => "{$uri->getScheme()}://{$uri->getHost()}:{$uri->getPort()}/{$uri->getPath()}?{$uri->getQuery()}#{$uri->getFragment()}",
             'body'   => $request->getBody()->getContents(),
         ]);
+    }
+
+    private function _prepareMockGetRequest(string $apiMethod, array $parameters = []): Psr\Http\Message\RequestInterface {
+        $url = $this->_prepareUrl($apiMethod);
+        $delimiter = mb_strpos($url, '?') !== false ? '&' : '?';
+        $urlWithQuery = "{$url}{$delimiter}" . http_build_query($parameters);
+        return new GuzzleHttp\Psr7\Request(Test\Engine\Entity\Mock::METHOD_GET, $urlWithQuery, [], null);
+    }
+
+    private function _prepareMockResponse(string $responseFile, int $statusCode = Test\Engine\Entity\Mock::HTTP_CODE_SUCCESS): Psr\Http\Message\ResponseInterface {
+        return new GuzzleHttp\Psr7\Response($statusCode, ['Content-Type' => 'application/json'], file_get_contents($responseFile));
     }
 }

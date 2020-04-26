@@ -2,21 +2,9 @@
 
 namespace Bitrix24ApiWrapper\Test\Engine;
 
-use Bitrix24ApiWrapper\Engine;
-use Bitrix24ApiWrapper\Request;
-use Bitrix24ApiWrapper\Entity;
-use GuzzleHttp;
-use GuzzleHttp\Psr7;
-use Psr;
+use Bitrix24ApiWrapper;
 
 abstract class AbstractTest extends \PHPUnit\Framework\TestCase {
-
-    protected const HTTP_CODE_SUCCESS       = 200;
-    protected const HTTP_CODE_UNAUTHORIZED  = 401;
-    protected const HTTP_CODE_ACCESS_DENIED = 403;
-    protected const HTTP_CODE_NOT_FOUND     = 404;
-
-    private const METHOD_GET  = 'GET';
 
     /** @var Mock\Extension\MockedEngineInterface */
     private $_engine;
@@ -32,29 +20,23 @@ abstract class AbstractTest extends \PHPUnit\Framework\TestCase {
      * @dataProvider errorsDataProvider
      */
     public function testErrors(string $responseFile, int $responseCode, string $exceptionClass): void {
-        $this->_engine()->setMockResponse(
-            $this->_prepareMockGetRequest('test'),
-            $this->_prepareMockResponse($responseFile, $responseCode)
-        );
+        $this->_engine()->setMockResponse(Entity\Mock::get('test', $responseFile, [], $responseCode));
         $this->expectException($exceptionClass);
-        $this->_engine()->execute(Request\Custom::get('test'));
+        $this->_engine()->execute(Bitrix24ApiWrapper\Request\Custom::get('test'));
     }
 
     public function errorsDataProvider(): array {
         return [
             // response file                                         response code                  expected exception class
-            [__DIR__ . '/Response/error_not_found_method.json',      self::HTTP_CODE_NOT_FOUND,     Engine\Exception\MethodNotFound::class],
-            [__DIR__ . '/Response/error_deleted_portal.json',        self::HTTP_CODE_ACCESS_DENIED, Engine\Exception\PortalDeleted::class],
-            [__DIR__ . '/Response/error_invalid_credentials.json',   self::HTTP_CODE_UNAUTHORIZED,  Engine\Exception\InvalidCredentials::class],
+            [__DIR__ . '/Response/error_not_found_method.json',      Entity\Mock::HTTP_CODE_NOT_FOUND,     Bitrix24ApiWrapper\Engine\Exception\MethodNotFound::class],
+            [__DIR__ . '/Response/error_deleted_portal.json',        Entity\Mock::HTTP_CODE_ACCESS_DENIED, Bitrix24ApiWrapper\Engine\Exception\PortalDeleted::class],
+            [__DIR__ . '/Response/error_invalid_credentials.json',   Entity\Mock::HTTP_CODE_UNAUTHORIZED,  Bitrix24ApiWrapper\Engine\Exception\InvalidCredentials::class],
         ];
     }
 
     public function testGetRequest(): void {
-        $this->_engine()->setMockResponse(
-            $this->_prepareMockGetRequest('crm.lead.list'),
-            $this->_prepareMockResponse(__DIR__ . '/Response/entity_list.json')
-        );
-        $actualResponse = $this->_engine()->execute(Request\Custom::get('crm.lead.list'));
+        $this->_engine()->setMockResponse(Entity\Mock::get('entity.list', __DIR__ . '/Response/entity_list.json'));
+        $actualResponse = $this->_engine()->execute(Bitrix24ApiWrapper\Request\Custom::get('entity.list'));
         $this->assertEquals([
             [
                 'INT' => 8,
@@ -78,56 +60,38 @@ abstract class AbstractTest extends \PHPUnit\Framework\TestCase {
     }
 
     public function testUnsupportedHttpMethod(): void {
-        $this->expectException(Engine\Exception\UnsupportedHttpMethod::class);
-        $this->_engine()->execute(new Request\Custom('PUT', 'test'));
+        $this->expectException(Bitrix24ApiWrapper\Engine\Exception\UnsupportedHttpMethod::class);
+        $this->_engine()->execute(new Bitrix24ApiWrapper\Request\Custom('PUT', 'test'));
     }
 
     public function testItemsRequest(): void {
         $parameters = ['select' => ['*', 'UF_*', 'EMAIL', 'PHONE'], 'filter' => ['NAME' => 'DIO'], 'order' => ['ID' => 'DESC']];
-        $this->_engine()->setMockResponse(
-            $this->_prepareMockGetRequest('entity.list', $parameters),
-            $this->_prepareMockResponse(__DIR__ . '/Response/entity_list.json')
-        );
-        /** @var Entity\CRM\Lead[] $actualResponse */
+        $this->_engine()->setMockResponse(Entity\Mock::get('entity.list', __DIR__ . '/Response/entity_list.json', $parameters));
+        /** @var Bitrix24ApiWrapper\Entity\CRM\Lead[] $actualResponse */
         $actualResponse = $this->_engine()->execute(Mock\Request\Some::get('entity.list', $parameters));
         $this->assertEquals($this->_expectedSomeEntities(), $actualResponse);
     }
 
     public function testItemsMultiPageRequest(): void {
-        $this->_engine()->setMockResponse(
-            $this->_prepareMockGetRequest('entity.list'),
-            $this->_prepareMockResponse(__DIR__ . '/Response/entity_list_page_1.json')
-        );
-        $this->_engine()->setMockResponse(
-            $this->_prepareMockGetRequest('entity.list', ['start' => 1]),
-            $this->_prepareMockResponse(__DIR__ . '/Response/entity_list_page_2.json')
-        );
-        /** @var Entity\CRM\Lead[] $actualResponse */
+        $this->_engine()->setMockResponse(Entity\Mock::get('entity.list', __DIR__ . '/Response/entity_list_page_1.json'));
+        $this->_engine()->setMockResponse(Entity\Mock::get('entity.list', __DIR__ . '/Response/entity_list_page_2.json', ['start' => 1]));
+        /** @var Bitrix24ApiWrapper\Entity\CRM\Lead[] $actualResponse */
         $actualResponse = $this->_engine()->execute(Mock\Request\Some::get('entity.list'));
         $this->assertEquals($this->_expectedSomeEntities(), $actualResponse);
     }
 
     public function testMultiPageReachedMaxCountException(): void {
-        $this->_engine()->setMockResponse(
-            $this->_prepareMockGetRequest('entity.list'),
-            $this->_prepareMockResponse(__DIR__ . '/Response/entity_list_page_1.json')
-        );
-        $this->_engine()->setMockResponse(
-            $this->_prepareMockGetRequest('entity.list', ['start' => 1]),
-            $this->_prepareMockResponse(__DIR__ . '/Response/entity_list_page_2_with_next_page.json')
-        );
-        $this->expectException(Engine\Exception\ReachedMaxLoadedPageCount::class);
-        /** @var Entity\CRM\Lead[] $actualResponse */
+        $this->_engine()->setMockResponse(Entity\Mock::get('entity.list', __DIR__ . '/Response/entity_list_page_1.json'));
+        $this->_engine()->setMockResponse(Entity\Mock::get('entity.list', __DIR__ . '/Response/entity_list_page_2_with_next_page.json', ['start' => 1]));
+        $this->expectException(Bitrix24ApiWrapper\Engine\Exception\ReachedMaxLoadedPageCount::class);
+        /** @var Bitrix24ApiWrapper\Entity\CRM\Lead[] $actualResponse */
         $this->_engine()->execute(Mock\Request\Some::get('entity.list'));
     }
 
     public function testItemRequest(): void {
         $parameters = ['ID' => 6];
-        $this->_engine()->setMockResponse(
-            $this->_prepareMockGetRequest('entity.get', $parameters),
-            $this->_prepareMockResponse(__DIR__ . '/Response/entity_get.json')
-        );
-        /** @var Entity\CRM\Lead[] $actualResponse */
+        $this->_engine()->setMockResponse(Entity\Mock::get('entity.get', __DIR__ . '/Response/entity_get.json', $parameters));
+        /** @var Bitrix24ApiWrapper\Entity\CRM\Lead[] $actualResponse */
         $actualResponse = $this->_engine()->execute(Mock\Request\Some::get('entity.get', $parameters));
         $this->assertEquals($this->_expectedSecondSomeEntity(), $actualResponse);
     }
@@ -171,16 +135,5 @@ abstract class AbstractTest extends \PHPUnit\Framework\TestCase {
             $this->_engine = $this->_initEngine();
         }
         return $this->_engine;
-    }
-
-    protected function _prepareMockGetRequest(string $apiMethod, array $parameters = []): Psr\Http\Message\RequestInterface {
-        $url = $this->_prepareUrl($apiMethod);
-        $delimiter = mb_strpos($url, '?') !== false ? '&' : '?';
-        $urlWithQuery = "{$url}{$delimiter}" . http_build_query($parameters);
-        return new Psr7\Request(self::METHOD_GET, $urlWithQuery, [], null);
-    }
-
-    protected function _prepareMockResponse(string $responseFile, int $statusCode = self::HTTP_CODE_SUCCESS): Psr\Http\Message\ResponseInterface {
-        return new GuzzleHttp\Psr7\Response($statusCode, ['Content-Type' => 'application/json'], file_get_contents($responseFile));
     }
 }
