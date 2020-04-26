@@ -17,7 +17,6 @@ abstract class AbstractBasic implements BasicInterface {
 
     private const RESPONSE_RESULT = 'result';
     private const RESPONSE_NEXT   = 'next';
-    private const RESPONSE_TOTAL  = 'total';
 
     private const REQUEST_PARAM_START = 'start';
 
@@ -35,10 +34,10 @@ abstract class AbstractBasic implements BasicInterface {
     abstract protected function _prepareUrl(string $apiMethod): string;
 
     /**
-     * @param Request\BasicInterface $request
+     * @param Request\BasicInterface|Request\BasicInterface[] $request
      * @return mixed
      */
-    public function execute(Request\BasicInterface $request) {
+    public function execute($request) {
         $response = $this->_request($request->httpMethod(), $request->apiMethod(), $request->parameters());
         $result = $response[self::RESPONSE_RESULT] ?? null;
         $next = $response[self::RESPONSE_NEXT] ?? null;
@@ -109,7 +108,6 @@ abstract class AbstractBasic implements BasicInterface {
         $parametersWithStart = $parameters;
         $parametersWithStart[self::REQUEST_PARAM_START] = $next;
         $itemsLists = [];
-        $response = [];
         for ($i = 0; $i < $this->_maxLoadedPageCount(); $i++) {
             $response = $this->_request($httpMethod, $apiMethod, $parametersWithStart);
             $itemsLists[] = $response[self::RESPONSE_RESULT] ?? [];

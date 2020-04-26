@@ -7,8 +7,8 @@ use Bitrix24ApiWrapper\Request;
 interface BasicInterface {
 
     /**
-     * @param Request\BasicInterface $request
+     * @param Request\BasicInterface|Request\BasicInterface[] $request
      * @return mixed
      */
-    public function execute(Request\BasicInterface $request);
+    public function execute($request);
 }
