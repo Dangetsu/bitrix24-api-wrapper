@@ -2,7 +2,7 @@
 
 namespace Bitrix24ApiWrapper\Library;
 
-class Utils {
+class Utils implements UtilsInterface {
 
     public function isAssocArray(array $array): bool {
         return count(array_filter(array_keys($array), 'is_string')) > 0;

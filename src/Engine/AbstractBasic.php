@@ -23,7 +23,7 @@ abstract class AbstractBasic implements BasicInterface {
     /** @var GuzzleHttp\ClientInterface */
     private $_httpClient;
 
-    /** @var Library\Utils */
+    /** @var Library\UtilsInterface */
     private $_utils;
 
     abstract protected function _prepareUrl(string $apiMethod): string;
@@ -52,7 +52,7 @@ abstract class AbstractBasic implements BasicInterface {
         return $this->_httpClient;
     }
 
-    protected function _utils(): Library\Utils {
+    protected function _utils(): Library\UtilsInterface {
         if ($this->_utils === null) {
             $this->_utils = new Library\Utils();
         }
