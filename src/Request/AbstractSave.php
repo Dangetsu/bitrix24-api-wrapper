@@ -31,7 +31,7 @@ abstract class AbstractSave implements BasicInterface {
     }
 
     public function parameters(): array {
-        $parameters = ['fields' => $this->_entity->jsonSerialize()];
+        $parameters = ['fields' => $this->_entity];
         if ($this->_entity->id() !== null) {
             $parameters['id'] = $this->_entity->id();
         }

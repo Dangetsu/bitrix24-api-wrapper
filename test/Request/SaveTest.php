@@ -14,7 +14,7 @@ class SaveTest extends AbstractBasicTest {
     public function test(Request\BasicInterface $request, array $parameters): void {
         $this->assertSame(Request\BasicInterface::METHOD_POST, $request->httpMethod());
         $this->assertSame('entity.save', $request->apiMethod());
-        $this->assertSame($parameters, $request->parameters());
+        $this->assertEquals($parameters, $request->parameters());
         $this->assertNull($request->responseEntity());
     }
 
@@ -33,15 +33,15 @@ class SaveTest extends AbstractBasicTest {
 
         return [
             // Request                                                                                        parameters
-            [Mock\Request\SomeSave::instance($entityWithId, ['REGISTER_SONET_EVENT' => 'Y']),                 ['fields' => ['SOME' => 'test', 'ID' => '6', 'UNFAMILIAR' => '21314'], 'id' => '6', 'params' => ['REGISTER_SONET_EVENT' => 'Y']]],
-            [Mock\Request\SomeSave::instance($entityWithoutId, ['REGISTER_SONET_EVENT' => 'Y']),              ['fields' => ['SOME' => 'test', 'UNFAMILIAR' => '21314'], 'params' => ['REGISTER_SONET_EVENT' => 'Y']]],
-            [Mock\Request\SomeSave::instance($entityOnlyWithId, ['REGISTER_SONET_EVENT' => 'Y']),             ['fields' => ['ID' => '6'], 'id' => '6', 'params' => ['REGISTER_SONET_EVENT' => 'Y']]],
-            [Mock\Request\SomeSave::instance(new Mock\Entity\SomeEntity(), ['REGISTER_SONET_EVENT' => 'Y']),  ['fields' => [], 'params' => ['REGISTER_SONET_EVENT' => 'Y']]],
+            [Mock\Request\SomeSave::instance($entityWithId, ['REGISTER_SONET_EVENT' => 'Y']),                 ['fields' => $entityWithId, 'id' => '6', 'params' => ['REGISTER_SONET_EVENT' => 'Y']]],
+            [Mock\Request\SomeSave::instance($entityWithoutId, ['REGISTER_SONET_EVENT' => 'Y']),              ['fields' => $entityWithoutId, 'params' => ['REGISTER_SONET_EVENT' => 'Y']]],
+            [Mock\Request\SomeSave::instance($entityOnlyWithId, ['REGISTER_SONET_EVENT' => 'Y']),             ['fields' => $entityOnlyWithId, 'id' => '6', 'params' => ['REGISTER_SONET_EVENT' => 'Y']]],
+            [Mock\Request\SomeSave::instance(new Mock\Entity\SomeEntity(), ['REGISTER_SONET_EVENT' => 'Y']),  ['fields' => new Mock\Entity\SomeEntity(), 'params' => ['REGISTER_SONET_EVENT' => 'Y']]],
 
-            [Mock\Request\SomeSave::instance($entityWithId),                                                  ['fields' => ['SOME' => 'test', 'ID' => '6', 'UNFAMILIAR' => '21314'], 'id' => '6']],
-            [Mock\Request\SomeSave::instance($entityWithoutId),                                               ['fields' => ['SOME' => 'test', 'UNFAMILIAR' => '21314']]],
-            [Mock\Request\SomeSave::instance($entityOnlyWithId),                                              ['fields' => ['ID' => '6'], 'id' => '6']],
-            [Mock\Request\SomeSave::instance(new Mock\Entity\SomeEntity()),                                   ['fields' => []]],
+            [Mock\Request\SomeSave::instance($entityWithId),                                                  ['fields' => $entityWithId, 'id' => '6']],
+            [Mock\Request\SomeSave::instance($entityWithoutId),                                               ['fields' => $entityWithoutId]],
+            [Mock\Request\SomeSave::instance($entityOnlyWithId),                                              ['fields' => $entityOnlyWithId, 'id' => '6']],
+            [Mock\Request\SomeSave::instance(new Mock\Entity\SomeEntity()),                                   ['fields' => new Mock\Entity\SomeEntity()]],
         ];
     }
 }
