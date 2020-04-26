@@ -93,6 +93,34 @@ abstract class AbstractTest extends \PHPUnit\Framework\TestCase {
         $this->assertEquals($this->_expectedSomeEntities(), $actualResponse);
     }
 
+    public function testItemsMultiPageRequest(): void {
+        $this->_engine()->setMockResponse(
+            $this->_prepareMockGetRequest('entity.list'),
+            $this->_prepareMockResponse(__DIR__ . '/Response/entity_list_page_1.json')
+        );
+        $this->_engine()->setMockResponse(
+            $this->_prepareMockGetRequest('entity.list', ['start' => 1]),
+            $this->_prepareMockResponse(__DIR__ . '/Response/entity_list_page_2.json')
+        );
+        /** @var Entity\CRM\Lead[] $actualResponse */
+        $actualResponse = $this->_engine()->execute(Mock\Request\Some::get('entity.list'));
+        $this->assertEquals($this->_expectedSomeEntities(), $actualResponse);
+    }
+
+    public function testMultiPageReachedMaxCountException(): void {
+        $this->_engine()->setMockResponse(
+            $this->_prepareMockGetRequest('entity.list'),
+            $this->_prepareMockResponse(__DIR__ . '/Response/entity_list_page_1.json')
+        );
+        $this->_engine()->setMockResponse(
+            $this->_prepareMockGetRequest('entity.list', ['start' => 1]),
+            $this->_prepareMockResponse(__DIR__ . '/Response/entity_list_page_2_with_next_page.json')
+        );
+        $this->expectException(Engine\Exception\ReachedMaxLoadedPageCount::class);
+        /** @var Entity\CRM\Lead[] $actualResponse */
+        $this->_engine()->execute(Mock\Request\Some::get('entity.list'));
+    }
+
     public function testItemRequest(): void {
         $parameters = ['ID' => 6];
         $this->_engine()->setMockResponse(

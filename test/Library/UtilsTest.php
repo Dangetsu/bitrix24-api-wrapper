@@ -69,4 +69,77 @@ class UtilsTest extends \PHPUnit\Framework\TestCase {
             ['{',                      null,                   Library\Exception\JSON::class],
         ];
     }
+
+    /**
+     * @param mixed $value
+     * @param bool $expected
+     * @dataProvider isPositiveNumericIntDataProvider
+     */
+    public function testIsPositiveNumericInt($value, bool $expected): void {
+        $this->assertEquals($expected, $this->_utils->isPositiveNumericInt($value));
+    }
+
+    public function isPositiveNumericIntDataProvider(): array {
+        $object = new \stdClass();
+        return [
+            // value      expected
+            [0,           false],
+            [-0,          false],
+            [0000000000,  false],
+            [1,           true],
+            [2,           true],
+            [-2,          false],
+            [4125421,     true],
+            [4622553255,  true],
+            [-4622553255, false],
+
+            [3.01,        false],
+            [-3.01,       false],
+            [0423.42e0,   false],
+            [-0423.42e0,  false],
+            [0.0000001,   false],
+            [-0.0000001,  false],
+
+            ['',          false],
+            ['fdbsfvbsd', false],
+            ['//fsg',     false],
+            ['[qwe]',     false],
+            ['++--0',     false],
+            ['5454545',   true],
+            ['3',         true],
+            ['-3',        false],
+            ['-0',        false],
+            ['0xf4c3b0',  false],
+            ['-0xf4c3b0', false],
+            ['0b101001',  false],
+            ['-0b101001', false],
+            ['0123e6',    false],
+            ['-0123e6',   false],
+            ['0123.45e6', false],
+            ['1e0',       false],
+            ['-0e0',      false],
+
+            ['3.14',      false],
+            ['-3.14',     false],
+            ['0123.45e0', false],
+            ['-012.45e0', false],
+
+            ['3qwe',      false],
+            ['3.14qwe',   false],
+            ['qwe',       false],
+            ['qwe3',      false],
+
+            [null,        false],
+            [[],          false],
+            [['test'],    false],
+            [[1],         false],
+            [true,        false],
+            [false,       false],
+            [NAN,         false],
+            [INF,         false],
+            [-INF,        false],
+
+            [$object,     false],
+        ];
+    }
 }

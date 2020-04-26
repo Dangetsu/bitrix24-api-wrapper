@@ -4,6 +4,22 @@ namespace Bitrix24ApiWrapper\Library;
 
 class Utils implements UtilsInterface {
 
+    /**
+     * @param mixed $value
+     * @return bool
+     */
+    public function isNumericInt($value): bool {
+        return is_numeric($value) && (is_int($value) || (string)$value === (string)((int)$value));
+    }
+
+    /**
+     * @param mixed $value
+     * @return bool
+     */
+    public function isPositiveNumericInt($value): bool {
+        return $this->isNumericInt($value) && $value > 0;
+    }
+
     public function isAssocArray(array $array): bool {
         return count(array_filter(array_keys($array), 'is_string')) > 0;
     }

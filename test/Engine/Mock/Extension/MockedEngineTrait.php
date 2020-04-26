@@ -24,6 +24,10 @@ trait MockedEngineTrait {
         return new GuzzleHttp\Client(['handler' => $stack]);
     }
 
+    protected function _maxLoadedPageCount(): int {
+        return 1;
+    }
+
     private function _responseMockingProcessor(GuzzleHttp\Handler\MockHandler $handler): callable {
         return function (Psr\Http\Message\RequestInterface $request, array $options) use ($handler): GuzzleHttp\Promise\PromiseInterface {
             $requestMd5 = $this->_calcMd5ByRequest($request);

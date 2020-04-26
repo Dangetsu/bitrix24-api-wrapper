@@ -1,0 +1,37 @@
+{
+  "result": [
+    {
+      "INT": 6,
+      "FLOAT": 123.32,
+      "STRING": "Новый лид от JOTARO",
+      "NULL": null,
+      "BOOL": false,
+      "ARRAY": ["1", "2", "3"],
+      "OBJECT": {
+        "ID": "4",
+        "VALUE": "test@gmail.xcom"
+      },
+      "OBJECTS": [
+        {
+          "ID": "2",
+          "VALUE": "value1"
+        },
+        {
+          "ID": "4",
+          "VALUE": "value2"
+        }
+      ],
+      "UNFAMILIAR": "21314",
+      "UNFAMILIAR_NULL": null
+    }
+  ],
+  "total": 2,
+  "time": {
+    "start": 1587666756.409639,
+    "finish": 1587666756.531686,
+    "duration": 0.12204718589782715,
+    "processing": 0.09800004959106445,
+    "date_start": "2020-04-23T21:32:36+03:00",
+    "date_finish": "2020-04-23T21:32:36+03:00"
+  }
+}

@@ -16,6 +16,12 @@ abstract class AbstractBasic implements BasicInterface {
     private const ERROR_INVALID_CREDENTIALS = 'INVALID_CREDENTIALS';
 
     private const RESPONSE_RESULT = 'result';
+    private const RESPONSE_NEXT   = 'next';
+    private const RESPONSE_TOTAL  = 'total';
+
+    private const REQUEST_PARAM_START = 'start';
+
+    private const DEFAULT_MAX_LOADED_PAGE_COUNT = 1000;
 
     /** @var Builder\BasicInterface */
     private $_builder;
@@ -35,7 +41,15 @@ abstract class AbstractBasic implements BasicInterface {
     public function execute(Request\BasicInterface $request) {
         $response = $this->_request($request->httpMethod(), $request->apiMethod(), $request->parameters());
         $result = $response[self::RESPONSE_RESULT] ?? null;
+        $next = $response[self::RESPONSE_NEXT] ?? null;
+        if ($this->_utils()->isPositiveNumericInt($next)) {
+            $result = array_merge($result, $this->_loadAllPages($request->httpMethod(), $request->apiMethod(), $request->parameters(), $next));
+        }
         return $this->_prepareResponse($request->responseEntity(), $result);
+    }
+
+    protected function _maxLoadedPageCount(): int {
+        return self::DEFAULT_MAX_LOADED_PAGE_COUNT;
     }
 
     protected function _builder(): Builder\BasicInterface {
@@ -89,6 +103,23 @@ abstract class AbstractBasic implements BasicInterface {
         } catch (GuzzleHttp\Exception\RequestException $exception) {
             throw $this->_replaceRequestException($exception);
         }
+    }
+
+    private function _loadAllPages(string $httpMethod, string $apiMethod, array $parameters = [], int $next = 0): array {
+        $parametersWithStart = $parameters;
+        $parametersWithStart[self::REQUEST_PARAM_START] = $next;
+        $itemsLists = [];
+        $response = [];
+        for ($i = 0; $i < $this->_maxLoadedPageCount(); $i++) {
+            $response = $this->_request($httpMethod, $apiMethod, $parametersWithStart);
+            $itemsLists[] = $response[self::RESPONSE_RESULT] ?? [];
+            $nextFromResponse = $response[self::RESPONSE_NEXT] ?? null;
+            if (!$this->_utils()->isPositiveNumericInt($nextFromResponse)) {
+                return array_merge(...$itemsLists);
+            }
+            $parametersWithStart[self::REQUEST_PARAM_START] = $nextFromResponse;
+        }
+        throw new Exception\ReachedMaxLoadedPageCount('Reached max loaded page count. Redefine _maxLoadedPageCount method, or narrow the selection.');
     }
 
     private function _prepareOptionsByHttpMethod(string $httpMethod, array $parameters = []): array {
