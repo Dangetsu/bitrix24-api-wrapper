@@ -7,10 +7,11 @@ class Mock {
     public const METHOD_GET  = 'GET';
     public const METHOD_POST = 'POST';
 
-    public const HTTP_CODE_SUCCESS       = 200;
-    public const HTTP_CODE_UNAUTHORIZED  = 401;
-    public const HTTP_CODE_ACCESS_DENIED = 403;
-    public const HTTP_CODE_NOT_FOUND     = 404;
+    public const HTTP_CODE_SUCCESS               = 200;
+    public const HTTP_CODE_UNAUTHORIZED          = 401;
+    public const HTTP_CODE_ACCESS_DENIED         = 403;
+    public const HTTP_CODE_NOT_FOUND             = 404;
+    public const HTTP_CODE_INTERNAL_SERVER_ERROR = 500;
 
     /** @var string */
     private $_httpMethod;

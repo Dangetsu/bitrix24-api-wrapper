@@ -27,10 +27,11 @@ abstract class AbstractTest extends \PHPUnit\Framework\TestCase {
 
     public function errorsDataProvider(): array {
         return [
-            // response file                                         response code                  expected exception class
-            [__DIR__ . '/Response/error_not_found_method.json',      Entity\Mock::HTTP_CODE_NOT_FOUND,     Bitrix24ApiWrapper\Engine\Exception\MethodNotFound::class],
-            [__DIR__ . '/Response/error_deleted_portal.json',        Entity\Mock::HTTP_CODE_ACCESS_DENIED, Bitrix24ApiWrapper\Engine\Exception\PortalDeleted::class],
-            [__DIR__ . '/Response/error_invalid_credentials.json',   Entity\Mock::HTTP_CODE_UNAUTHORIZED,  Bitrix24ApiWrapper\Engine\Exception\InvalidCredentials::class],
+            // response file                                         response code                                  expected exception class
+            [__DIR__ . '/Response/error_not_found_method.json',      Entity\Mock::HTTP_CODE_NOT_FOUND,              Bitrix24ApiWrapper\Engine\Exception\MethodNotFound::class],
+            [__DIR__ . '/Response/error_deleted_portal.json',        Entity\Mock::HTTP_CODE_ACCESS_DENIED,          Bitrix24ApiWrapper\Engine\Exception\PortalDeleted::class],
+            [__DIR__ . '/Response/error_invalid_credentials.json',   Entity\Mock::HTTP_CODE_UNAUTHORIZED,           Bitrix24ApiWrapper\Engine\Exception\InvalidCredentials::class],
+            [__DIR__ . '/Response/error_custom.json',                Entity\Mock::HTTP_CODE_INTERNAL_SERVER_ERROR,  Bitrix24ApiWrapper\Engine\Exception\Basic::class],
         ];
     }
 
