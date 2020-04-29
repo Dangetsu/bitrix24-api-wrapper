@@ -22,6 +22,10 @@ abstract class AbstractBasic implements BasicInterface {
 
     private const DEFAULT_MAX_LOADED_PAGE_COUNT = 1000;
 
+    private const API_METHOD_BATCH = 'batch';
+
+    private const MAX_BATCH_COMMANDS_BY_REQUEST = 50;
+
     /** @var Builder\BasicInterface */
     private $_builder;
 
@@ -38,6 +42,9 @@ abstract class AbstractBasic implements BasicInterface {
      * @return mixed
      */
     public function execute($request) {
+        if (is_array($request)) {
+            return $this->_executeBatchRequest($request);
+        }
         $response = $this->_request($request->httpMethod(), $request->apiMethod(), $request->parameters());
         $result = $response[self::RESPONSE_RESULT] ?? null;
         $next = $response[self::RESPONSE_NEXT] ?? null;
@@ -145,5 +152,44 @@ abstract class AbstractBasic implements BasicInterface {
             default:
                 return new Exception\Basic($exception->getMessage());
         }
+    }
+
+    /**
+     * @param Request\BasicInterface[] $requests
+     * @return array
+     * @throws Exception\Basic
+     */
+    private function _executeBatchRequest(array $requests): array {
+        $commands = array_map(function (Request\BasicInterface $request): string {
+            return $this->_buildBatchQuery($request->apiMethod(), $request->parameters());
+        }, $requests);
+        $commandsByChunks = array_chunk($commands, self::MAX_BATCH_COMMANDS_BY_REQUEST, true);
+        $responsesLists = [];
+        foreach ($commandsByChunks as $commandsFromChunk) {
+            $response = $this->_request(self::HTTP_METHOD_POST, self::API_METHOD_BATCH, ['cmd' => $commandsFromChunk]);
+            $results = $response[self::RESPONSE_RESULT][self::RESPONSE_RESULT] ?? [];
+            $responsesLists[] = $this->_prepareResponsesForBatch($requests, $results);
+        }
+        return array_merge([], ...$responsesLists);
+    }
+
+    /**
+     * @param Request\BasicInterface[] $requests
+     * @param array $responses
+     * @return array
+     */
+    private function _prepareResponsesForBatch(array $requests, array $responses): array {
+        $preparedResponses = [];
+        foreach ($responses as $requestKey => $response) {
+            $request = $requests[$requestKey] ?? null;
+            $preparedResponses[$requestKey] = $request !== null
+                ? $this->_prepareResponse($request->responseEntity(), $response)
+                : $response;
+        }
+        return $preparedResponses;
+    }
+
+    private function _buildBatchQuery(string $method, array $params): string {
+        return "{$method}?" . http_build_query($params);
     }
 }

@@ -111,13 +111,42 @@ abstract class AbstractTest extends \PHPUnit\Framework\TestCase {
         $this->assertSame('2', $actualResponse);
     }
 
+    public function testBatchRequest(): void {
+        $this->_engine()->setMockResponse($this->_prepareBatchMock([
+            'get'  => Entity\Mock::post('entity.get', ''),
+            'list' => Entity\Mock::post('entity.list', ''),
+        ], __DIR__ . '/Response/batch_call_with_keys.json'));
+        ['get' => $actualGetResponse, 'list' => $actualListResponse] = $this->_engine()->execute([
+            'get'  => Mock\Request\Some::get('entity.get'),
+            'list' => Mock\Request\Some::get('entity.list'),
+        ]);
+        $this->assertEquals($this->_expectedFirstSomeEntity(), $actualGetResponse);
+        $this->assertEquals([$this->_expectedSecondSomeEntity()], $actualListResponse);
+    }
+
+    /**
+     * @param Entity\Mock[] $mocks
+     * @param string $responseFile
+     * @return Entity\Mock
+     */
+    private function _prepareBatchMock(array $mocks, string $responseFile): Entity\Mock {
+        $commands = array_map(function (Entity\Mock $mock): string {
+            return "{$mock->apiMethod()}?" . http_build_query($mock->parameters());
+        }, $mocks);
+        return Entity\Mock::post('batch', $responseFile, ['cmd' => $commands]);
+    }
+
     /**
      * @return Mock\Entity\SomeEntity[]
      */
     private function _expectedSomeEntities(): array {
+        return [$this->_expectedFirstSomeEntity(), $this->_expectedSecondSomeEntity()];
+    }
+
+    private function _expectedFirstSomeEntity(): Mock\Entity\SomeEntity {
         $firstEntity = new Mock\Entity\SomeEntity();
         $firstEntity->INT = 8;
-        return [$firstEntity, $this->_expectedSecondSomeEntity()];
+        return $firstEntity;
     }
 
     private function _expectedSecondSomeEntity(): Mock\Entity\SomeEntity {

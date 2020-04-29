@@ -1,0 +1,65 @@
+{
+  "result": {
+    "result": {
+      "list": [
+        {
+          "INT": 6,
+          "FLOAT": 123.32,
+          "STRING": "Новый лид от JOTARO",
+          "NULL": null,
+          "BOOL": false,
+          "ARRAY": ["1", "2", "3"],
+          "OBJECT": {
+            "ID": "4",
+            "VALUE": "test@gmail.xcom"
+          },
+          "OBJECTS": [
+            {
+              "ID": "2",
+              "VALUE": "value1"
+            },
+            {
+              "ID": "4",
+              "VALUE": "value2"
+            }
+          ],
+          "UNFAMILIAR": "21314",
+          "UNFAMILIAR_NULL": null
+        }
+      ],
+      "get": {
+        "INT": 8
+      }
+    },
+    "result_error": [],
+    "result_total": {
+      "list": 1
+    },
+    "result_time": {
+      "list": {
+        "start": 1588188565.552873,
+        "finish": 1588188565.593239,
+        "duration": 0.040366172790527344,
+        "processing": 0.040235042572021484,
+        "date_start": "2020-04-29T22:29:25+03:00",
+        "date_finish": "2020-04-29T22:29:25+03:00"
+      },
+      "get": {
+        "start": 1588188565.593311,
+        "finish": 1588188565.597741,
+        "duration": 0.004429817199707031,
+        "processing": 0.004343986511230469,
+        "date_start": "2020-04-29T22:29:25+03:00",
+        "date_finish": "2020-04-29T22:29:25+03:00"
+      }
+    }
+  },
+  "time": {
+    "start": 1588188565.529796,
+    "finish": 1588188565.597758,
+    "duration": 0.0679621696472168,
+    "processing": 0.044921875,
+    "date_start": "2020-04-29T22:29:25+03:00",
+    "date_finish": "2020-04-29T22:29:25+03:00"
+  }
+}

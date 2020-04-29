@@ -22,6 +22,8 @@ abstract class AbstractItems implements BasicInterface {
     private $_isLoadOnlyFirstPage;
 
     /**
+     * In batch request load only first page
+     *
      * @param array $filter
      * @param array $order
      * @param array $select
